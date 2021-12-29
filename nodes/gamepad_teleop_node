@@ -86,6 +86,59 @@ class GamepadState:
         self.RX = msg.axes[2]
         self.RY = msg.axes[3]
         self.RT = msg.axes[13]
+    
+    def parse_xsx(self, msg):
+        if len(msg.buttons) != 11 or len(msg.axes) != 8:
+            raise ValueError('Invalid number of buttons (%d) or axes (%d)' % (
+                len(msg.buttons), len(msg.axes)))
+
+        if msg.axes[6] == 1.0:
+            self.DL = True
+            self.DR = False
+        elif msg.axes[6] == -1.0:
+            self.DR = True
+            self.DL = False
+        else:
+            self.DR = False
+            self.DL = False
+
+        if msg.axes[7] == 1.0:
+            self.DU = True
+            self.DD = False
+        elif msg.axes[7] == -1.0:
+            self.DD = True
+            self.DU = False
+        else:
+            self.DU = False
+            self.DD = False
+        
+        if msg.axes[2] == -1.0:
+            self.L2 = True
+        else:
+            self.L2 = False
+
+        if msg.axes[5] == -1.0:
+            self.R2 = True
+        else:
+            self.R2 = False
+
+        self.Select = msg.buttons[6]
+        self.L3 = msg.buttons[9]
+        self.R3 = msg.buttons[10]
+        self.Start = msg.buttons[7]
+        self.L1 = msg.buttons[4]
+        self.R1 = msg.buttons[5]
+        self.Tr = msg.buttons[3] # Y
+        self.Ci = msg.buttons[1] # B
+        self.Cr = msg.buttons[0] # A
+        self.Sq = msg.buttons[2] # X
+        self.Sync = msg.buttons[8]
+        self.LX = msg.axes[0]
+        self.LY = msg.axes[1]
+        self.LT = msg.axes[2]
+        self.RX = msg.axes[3]
+        self.RY = msg.axes[4]
+        self.RT = msg.axes[5]
 
     def parse(self, msg):
         err = None
@@ -95,6 +148,10 @@ class GamepadState:
             err = e
         try:
             return self.parse_ps3_usb2(msg)
+        except ValueError, e:
+            err = e
+        try:
+            return self.parse_xsx(msg)
         except ValueError, e:
             err = e
         raise err
@@ -200,7 +257,7 @@ class GamepadTeleopNode:
 
         if not self.joy_state_prev.Sq and self.joy_state.Sq:
             self.pub_flip.publish(self.flip_dir)
-            #rospy.logwarn('Issued FLIP %d' % self.flip_dir)
+            # rospy.logwarn('Issued FLIP %d' % self.flip_dir)
             self.flip_dir += 1
             if self.flip_dir > self.MAX_FLIP_DIR:
                 self.flip_dir = 0
@@ -210,7 +267,7 @@ class GamepadTeleopNode:
             self.agent_mode_t = rospy.Time.now()
         else:
             self.agent_mode_t = None
-
+        
         # Manual control mode
         if self.agent_mode_t is None:
             if not self.joy_state_prev.Start and self.joy_state.Start:                
