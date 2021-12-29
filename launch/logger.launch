@@ -7,22 +7,28 @@
 /rosout
 /rosout_agg
 /tello/agent_cmd_vel_in
+/tello/camera/camera_info
 /tello/cmd_vel
 /tello/flattrim
 /tello/flip
+/tello/image_raw/compressed
+/tello/image_raw/h264
+/tello/imu
 /tello/land
 /tello/odom
+/tello/palm_land
 /tello/reset
 /tello/status
 /tello/takeoff
 /tello/tello/parameter_descriptions
 /tello/tello/parameter_updates
 /tello/throw_takeoff
+/tello/video_mode
      "/>
 <!--
 Omitted topics:
 /tello/image_raw
-/tello/image_raw/compressed
+
 -->
   <node pkg="rosbag" type="record" name="rosbag_record" args="--output-prefix=$(arg bag.name) $(arg bag.topics)" output="screen" />
 </launch>
